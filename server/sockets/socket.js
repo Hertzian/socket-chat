@@ -27,17 +27,27 @@ io.on('connection', (client) => {
             .to(data.sala)
             .emit('listaPersona', usuarios.getPersonasPorSala(data.sala));
 
+        client.broadcast
+            .to(data.sala)
+            // {usuario:'Admin', mensaje: `${personaBorrada.nombre} abandonó el chat`}
+            .emit('crearMensaje', crearMensaje('Admin', `${data.nombre} se unió`));
+
+
         callback(usuarios.getPersonasPorSala(data.sala));
     });
 
     // de utils
-    client.on('crearMensaje', (data) =>{
+    // el callback es para el jequery File
+    client.on('crearMensaje', (data, callback) =>{
         let persona = usuarios.getPersona(client.id);
 
         let mensaje = crearMensaje(persona.nombre, data.mensaje);
         client.broadcast
             .to(persona.sala)
             .emit('crearMensaje', mensaje);
+
+        
+        callback(mensaje)
     })
 
     // cuando un usuario se desconecta/recarga pantalla, para depurar usuario y no se duplique
